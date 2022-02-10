@@ -1,0 +1,43 @@
+---
+title: "Get iNaturalist Data"
+output: html_notebook
+---
+
+This markdown document explains and demonstrates how to use R to obtain data from iNaturalist.
+
+Set things up
+```{r}
+rm(list = ls())
+library(tidyverse)
+library(here)
+library(rinat) #package for working with iNaturalist api
+```
+
+Now grab some data:
+
+```{r}
+boundbox<-c(42.49389,-79.85212, 46.66546, -72.59276)
+ERDO<-get_inat_obs(taxon_name = "Erethizon dorsatum",
+                   geo = TRUE, 
+                   maxresults = 5000, 
+                   bounds = boundbox)
+```
+And map
+```{r}
+Porky_map<-inat_map(ERDO,plot = FALSE)
+Porky_map
+```
+```{r}
+ggplot(ERDO, aes(longitude, latitude, color = scientific_name))+
+  geom_polygon(data = map_data("world"),
+               aes(x = long, y = lat, group = group),
+               fill = "grey95",
+               color = "grey40",
+               size = 0.1)+
+  geom_point(size = 0.7, alpha = 0.5)+
+  coord_fixed(xlim = range(ERDO$longitude, na.rm = T),
+              ylim = range(ERDO$latitude, na.rm = T))+
+  theme_bw()
+```
+
+
